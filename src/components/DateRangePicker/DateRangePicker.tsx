@@ -14,7 +14,11 @@ import {
   VerticalDivider,
 } from "./DateRangePicker.styles";
 import { DateRangePickerProps } from "./DateRangePicker.types";
-import { dateRangePickerReducer, initialState } from "./DateRangePicker.utils";
+import {
+  dateRangePickerReducer,
+  formatDate,
+  initialState,
+} from "./DateRangePicker.utils";
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
   predefinedRanges = [],
@@ -85,11 +89,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const updateSelectedRange = () => {
     if (state.startDate && state.endDate) {
+      const startDateString = formatDate(state.startDate);
+      const endDateString = formatDate(state.endDate);
+
       dispatch({
         type: "SET_SELECTED_RANGE",
-        payload: `${state.startDate.toISOString().split("T")[0]} ~ ${
-          state.endDate.toISOString().split("T")[0]
-        }`,
+        payload: `${startDateString} ~ ${endDateString}`,
       });
     } else {
       dispatch({ type: "SET_SELECTED_RANGE", payload: "" });
@@ -142,8 +147,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const getSelectedRange = () => {
     if (state.startDate && state.endDate) {
       const selectedRange: [string, string] = [
-        state.startDate.toISOString().split("T")[0],
-        state.endDate.toISOString().split("T")[0],
+        formatDate(state.startDate),
+        formatDate(state.endDate),
       ];
       const weekendDates: string[] = getWeekendDates(
         state.startDate,
@@ -159,7 +164,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
     while (currentDate <= endDate) {
       if (isWeekend(currentDate)) {
-        weekendDates.push(currentDate.toISOString().split("T")[0]);
+        weekendDates.push(formatDate(currentDate));
       }
       currentDate.setDate(currentDate.getDate() + 1);
     }

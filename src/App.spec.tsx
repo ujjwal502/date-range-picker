@@ -8,7 +8,7 @@ describe("App", () => {
 
   it("renders the heading", () => {
     const heading = screen.getByRole("heading", {
-      name: "Date Range Picker Example",
+      name: "Here is an example of Date Range Picker",
     });
     expect(heading).toBeInTheDocument();
   });
