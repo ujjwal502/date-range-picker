@@ -1,10 +1,6 @@
 import { FC, useMemo } from "react";
-import {
-  CalendarHeaderWrapper,
-  SelectField,
-  SelectIcon,
-  SelectWrapper,
-} from "./CalendarHeader.styles";
+import { CalendarHeaderWrapper } from "./CalendarHeader.styles";
+import Select from "../../shared/Select/Select";
 
 interface CalendarHeaderPropsModel {
   handleMonthChange: (month: number) => void;
@@ -19,49 +15,45 @@ const CalendarHeader: FC<CalendarHeaderPropsModel> = ({
   displayYear,
   displayMonth,
 }) => {
-  const renderYearsList = useMemo(() => {
-    return Array.from(
-      { length: 100 },
-      (_, i) => new Date().getFullYear() - 50 + i
-    ).map((year) => (
-      <option key={year} value={year}>
-        {year}
-      </option>
-    ));
+  const generateYearsOptions = (startYear: number, endYear: number) => {
+    return Array.from({ length: endYear - startYear + 1 }, (_, i) => {
+      const year = startYear + i;
+      return { label: String(year), value: year };
+    });
+  };
+
+  const generateMonthsOptions = (year: number) => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const month = i;
+      const monthName = new Date(year, month).toLocaleString("default", {
+        month: "long",
+      });
+      return { label: monthName, value: month };
+    });
+  };
+
+  const yearsOptions = useMemo(() => {
+    const startYear = new Date().getFullYear() - 50;
+    const endYear = new Date().getFullYear() + 49;
+    return generateYearsOptions(startYear, endYear);
   }, []);
 
-  const renderMonthsList = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => i).map((month) => (
-      <option key={month} value={month}>
-        {new Date(displayYear, month).toLocaleString("default", {
-          month: "long",
-        })}
-      </option>
-    ));
+  const monthsOptions = useMemo(() => {
+    return generateMonthsOptions(displayYear);
   }, [displayYear]);
-
-  const onYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    handleYearChange(Number(e.target.value));
-  };
-
-  const onMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    handleMonthChange(Number(e.target.value));
-  };
 
   return (
     <CalendarHeaderWrapper>
-      <SelectWrapper>
-        <SelectField value={displayYear} onChange={onYearChange}>
-          <>{renderYearsList}</>
-        </SelectField>
-        <SelectIcon>▼</SelectIcon>
-      </SelectWrapper>
-      <SelectWrapper>
-        <SelectField value={displayMonth} onChange={onMonthChange}>
-          <>{renderMonthsList}</>
-        </SelectField>
-        <SelectIcon>▼</SelectIcon>
-      </SelectWrapper>
+      <Select
+        value={displayYear}
+        onChange={handleYearChange}
+        options={yearsOptions}
+      />
+      <Select
+        value={displayMonth}
+        onChange={handleMonthChange}
+        options={monthsOptions}
+      />
     </CalendarHeaderWrapper>
   );
 };

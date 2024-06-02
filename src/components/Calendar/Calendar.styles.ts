@@ -32,6 +32,10 @@ export const CalendarDays = styled.div`
     cursor: pointer;
   }
 
+  .calendar-day.today {
+    border: 2px solid #007bff;
+  }
+
   .calendar-day.weekend {
     background-color: #f0f0f0;
     cursor: not-allowed;

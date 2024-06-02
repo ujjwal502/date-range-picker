@@ -11,7 +11,6 @@ const App: React.FC = () => {
   };
 
   const predefinedRangesConfig = [
-    { label: "Today", daysAgo: 0 },
     { label: "Last 7 Days", daysAgo: 7 },
     { label: "Last 30 Days", daysAgo: 30 },
     { label: "Last 6 Months", monthsAgo: 6 },

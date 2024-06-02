@@ -48,10 +48,26 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const handleStartMonthChange = (month: number) => {
     dispatch({ type: "SET_START_MONTH", payload: month });
+
+    const nextMonth = (month + 1) % 12;
+    dispatch({ type: "SET_END_MONTH", payload: nextMonth });
+
+    if (nextMonth === 0) {
+      dispatch({ type: "SET_END_YEAR", payload: state.endYear + 1 });
+    }
   };
 
   const handleStartYearChange = (year: number) => {
     dispatch({ type: "SET_START_YEAR", payload: year });
+
+    // If the start year is changed to a future year, update the end year
+    if (year > state.endYear) {
+      dispatch({ type: "SET_END_YEAR", payload: year });
+
+      // Update the end month to the next month of the start month
+      const nextMonth = (state.startMonth + 1) % 12;
+      dispatch({ type: "SET_END_MONTH", payload: nextMonth });
+    }
   };
 
   const handleEndMonthChange = (month: number) => {
@@ -229,6 +245,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             startDate={state.startDate!}
             isWeekend={isWeekend}
             handleYearChange={handleStartYearChange}
+            today={new Date()}
           />
           <VerticalDivider />
 
@@ -241,6 +258,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             startDate={state.startDate!}
             isWeekend={isWeekend}
             handleYearChange={handleEndYearChange}
+            today={new Date()}
           />
         </CalendarContainer>
         <CustomRanges

@@ -25,6 +25,7 @@ describe("Calendar", () => {
         isWeekend={isWeekend}
         handleMonthChange={handleMonthChange}
         handleYearChange={handleYearChange}
+        today={new Date()}
       />
     );
   });

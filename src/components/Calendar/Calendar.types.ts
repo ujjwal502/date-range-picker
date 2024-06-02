@@ -7,4 +7,5 @@ export interface CalenderPropsModel {
   handleDateClick: (date: Date) => void;
   handleYearChange: (year: number) => void;
   handleMonthChange: (month: number) => void;
+  today: Date;
 }

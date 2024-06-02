@@ -1,5 +1,4 @@
-import { FC, useMemo } from "react";
-
+import { FC, useCallback, useMemo } from "react";
 import { CalenderPropsModel } from "./Calendar.types";
 import {
   CalendarDays,
@@ -18,11 +17,59 @@ const Calendar: FC<CalenderPropsModel> = ({
   isWeekend,
   handleMonthChange,
   handleYearChange,
+  today,
 }) => {
   const daysInMonth = getDaysInMonth(displayYear, displayMonth);
   const firstDay = new Date(displayYear, displayMonth, 1).getDay();
 
-  const getCalendarDays = useMemo(() => {
+  const isDateSelected = useCallback(
+    (date: Date) =>
+      (startDate && date.toDateString() === startDate.toDateString()) ||
+      (endDate && date.toDateString() === endDate.toDateString()),
+    [endDate, startDate]
+  );
+
+  const isDateInRange = useCallback(
+    (date: Date) =>
+      startDate &&
+      endDate &&
+      date > startDate &&
+      date < endDate &&
+      !isWeekend(date),
+    [endDate, isWeekend, startDate]
+  );
+
+  const renderCalendarDay = useCallback(
+    (day: number) => {
+      const date = new Date(displayYear, displayMonth, day);
+      const isSelected = isDateSelected(date);
+      const isInRange = isDateInRange(date);
+      const isToday = date.toDateString() === today.toDateString();
+
+      return (
+        <div
+          key={day}
+          className={`calendar-day ${isWeekend(date) ? "weekend" : ""} ${
+            isSelected ? "selected" : ""
+          } ${isInRange ? "in-range" : ""} ${isToday ? "today" : ""}`}
+          onClick={() => handleDateClick(date)}
+        >
+          {day}
+        </div>
+      );
+    },
+    [
+      displayMonth,
+      displayYear,
+      handleDateClick,
+      isDateInRange,
+      isDateSelected,
+      isWeekend,
+      today,
+    ]
+  );
+
+  const renderCalendarDays = useMemo(() => {
     const calendarDays = [];
 
     for (let i = 0; i < firstDay; i++) {
@@ -31,47 +78,12 @@ const Calendar: FC<CalenderPropsModel> = ({
       );
     }
 
-    // Add clickable divs for each day in the month
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(displayYear, displayMonth, day);
-
-      // Check if the current date is selected (start or end date)
-      const isSelected =
-        (startDate && date.toDateString() === startDate.toDateString()) ||
-        (endDate && date.toDateString() === endDate.toDateString());
-
-      // Check if the current date is within the selected range and not a weekend
-      const isInRange =
-        startDate &&
-        endDate &&
-        date > startDate &&
-        date < endDate &&
-        !isWeekend(date);
-
-      calendarDays.push(
-        <div
-          key={day}
-          className={`calendar-day ${isWeekend(date) ? "weekend" : ""} ${
-            isSelected ? "selected" : ""
-          } ${isInRange ? "in-range" : ""}`}
-          onClick={() => handleDateClick(date)}
-        >
-          {day}
-        </div>
-      );
+      calendarDays.push(renderCalendarDay(day));
     }
 
     return calendarDays;
-  }, [
-    daysInMonth,
-    displayMonth,
-    displayYear,
-    endDate,
-    firstDay,
-    handleDateClick,
-    isWeekend,
-    startDate,
-  ]);
+  }, [daysInMonth, firstDay, renderCalendarDay]);
 
   return (
     <CalendarWrapper data-testid="calendar-component">
@@ -90,7 +102,7 @@ const Calendar: FC<CalenderPropsModel> = ({
         ))}
       </CalendarWeekDays>
 
-      <CalendarDays>{getCalendarDays}</CalendarDays>
+      <CalendarDays>{renderCalendarDays}</CalendarDays>
     </CalendarWrapper>
   );
 };
