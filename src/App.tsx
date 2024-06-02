@@ -20,7 +20,7 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <h2 className="date-range-picker-header">
+      <h2 className="date-range-instruction-text">
         Here is an example of Date Range Picker
       </h2>
 
@@ -28,6 +28,10 @@ const App: React.FC = () => {
         predefinedRanges={predefinedRangesConfig}
         onChange={handleDateRangeChange}
       />
+      <h5 className="date-range-instruction-text">
+        Note :- please check the selected range and weekend dates array in
+        console
+      </h5>
     </div>
   );
 };
