@@ -5,6 +5,7 @@ import {
 } from "./DateRangePicker.types";
 
 import { Range } from "../CustomRanges/CustomRanges";
+import { isWeekend } from "../Calendar/calendar.utils";
 
 export const dateRangePickerReducer = (
   state: DateRangePickerState,
@@ -57,6 +58,8 @@ export const generatePredefinedRanges = (
   config: PredefinedRangeConfig[]
 ): Range[] => {
   const today = new Date();
+  // Setting the time of today to midnight to ensure a consistent end date
+  today.setHours(0, 0, 0, 0);
 
   return config.map(({ label, daysAgo, monthsAgo, yearsAgo }) => {
     const startDate = new Date(today);
@@ -69,10 +72,22 @@ export const generatePredefinedRanges = (
       startDate.setFullYear(startDate.getFullYear() - yearsAgo);
     }
 
+    // Adjusting start date to the nearest previous weekday if it falls on a weekend
+    while (isWeekend(startDate)) {
+      startDate.setDate(startDate.getDate() - 1);
+    }
+
+    const endDate = new Date(today);
+
+    // Adjusting end date to the nearest previous weekday if it falls on a weekend
+    while (isWeekend(endDate)) {
+      endDate.setDate(endDate.getDate() - 1);
+    }
+
     return {
       label,
       startDate,
-      endDate: today,
+      endDate,
     };
   });
 };
