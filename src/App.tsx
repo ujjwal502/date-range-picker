@@ -1,6 +1,5 @@
 import React from "react";
 import DateRangePicker from "./components/DateRangePicker/DateRangePicker";
-import { generatePredefinedRanges } from "./components/DateRangePicker/DateRangePicker.utils";
 
 const App: React.FC = () => {
   const handleDateRangeChange = (
@@ -12,13 +11,12 @@ const App: React.FC = () => {
   };
 
   const predefinedRangesConfig = [
+    { label: "Today", daysAgo: 0 },
     { label: "Last 7 Days", daysAgo: 7 },
     { label: "Last 30 Days", daysAgo: 30 },
     { label: "Last 6 Months", monthsAgo: 6 },
     { label: "Last 1 Year", yearsAgo: 1 },
   ];
-
-  const predefinedRanges = generatePredefinedRanges(predefinedRangesConfig);
 
   return (
     <div>
@@ -27,7 +25,7 @@ const App: React.FC = () => {
       </h2>
 
       <DateRangePicker
-        predefinedRanges={predefinedRanges}
+        predefinedRanges={predefinedRangesConfig}
         onChange={handleDateRangeChange}
       />
     </div>

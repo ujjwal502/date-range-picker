@@ -17,7 +17,7 @@ const CustomRanges: FC<CustomRangesPropsModel> = ({
   handlePredefinedRangeClick,
 }) => {
   return (
-    <CustomRangesWrapper>
+    <CustomRangesWrapper className={"preDefined-range"}>
       {predefinedRanges.map(({ label, startDate, endDate }) => (
         <div
           key={label}

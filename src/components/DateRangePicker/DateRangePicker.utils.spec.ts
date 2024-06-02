@@ -1,4 +1,8 @@
-import { dateRangePickerReducer, initialState } from "./DateRangePicker.utils";
+import {
+  dateRangePickerReducer,
+  formatDate,
+  initialState,
+} from "./DateRangePicker.utils";
 import {
   DateRangePickerState,
   DateRangePickerAction,
@@ -123,6 +127,32 @@ describe("DateRangePicker utils", () => {
         endMonth: (currentDate.getMonth() + 1) % 12,
       };
       expect(initialState).toEqual(expectedInitialState);
+    });
+  });
+
+  describe("formatDate", () => {
+    test("should return the correct date format for a valid date", () => {
+      const date = new Date("2022-12-01T00:00:00.000Z");
+      const formattedDate = formatDate(date);
+      expect(formattedDate).toBe("2022-12-01");
+    });
+
+    test("should handle single-digit months and days correctly", () => {
+      const date = new Date("2022-02-03T00:00:00.000Z");
+      const formattedDate = formatDate(date);
+      expect(formattedDate).toBe("2022-02-03");
+    });
+
+    test("should handle leap years correctly", () => {
+      const date = new Date("2024-02-29T00:00:00.000Z");
+      const formattedDate = formatDate(date);
+      expect(formattedDate).toBe("2024-02-29");
+    });
+
+    test("should handle invalid dates gracefully", () => {
+      const invalidDate = new Date("invalid");
+      const formattedDate = formatDate(invalidDate);
+      expect(formattedDate).toBe("NaN-NaN-NaN");
     });
   });
 });

@@ -1,5 +1,13 @@
+export interface PredefinedRangeConfig {
+  label: string;
+  // Only one of daysAgo, monthsAgo, or yearsAgo should be used at a time
+  daysAgo?: number;
+  monthsAgo?: number;
+  yearsAgo?: number;
+}
+
 export interface DateRangePickerProps {
-  predefinedRanges?: { label: string; startDate: Date; endDate: Date }[];
+  predefinedRanges?: PredefinedRangeConfig[];
   onChange: (selectedRange: [string, string], weekendDates: string[]) => void;
 }
 
@@ -24,10 +32,3 @@ export type DateRangePickerAction =
   | { type: "SET_END_YEAR"; payload: number }
   | { type: "SET_END_MONTH"; payload: number }
   | { type: "CLEAR_SELECTED_DATES" };
-
-export interface PredefinedRangeConfig {
-  label: string;
-  daysAgo?: number;
-  monthsAgo?: number;
-  yearsAgo?: number;
-}

@@ -37,7 +37,7 @@ describe("DateRangePicker", () => {
       "Please click me to select the date!"
     );
     fireEvent.click(inputField);
-    const modal = screen.getByTestId("calendar-modal");
+    const modal = screen.getByTestId("modal");
     expect(modal).toBeInTheDocument();
   });
 
@@ -70,5 +70,55 @@ describe("DateRangePicker", () => {
     fireEvent.click(closeButton);
     const modal = screen.queryByTestId("calendar-modal");
     expect(modal).not.toBeInTheDocument();
+  });
+
+  it("calls the onChange callback with the selected date range and weekend dates", () => {
+    const { container } = render(
+      <DateRangePicker
+        predefinedRanges={predefinedRanges}
+        onChange={onChange}
+      />
+    );
+
+    const inputEle = container.getElementsByTagName("input")[0];
+    fireEvent.click(inputEle);
+
+    //Putting the arbitrary index so that I do not click non-clickable div
+    const dateDivEle = container.getElementsByClassName("calendar-day")[25];
+    fireEvent.click(dateDivEle);
+    fireEvent.click(dateDivEle);
+
+    fireEvent.click(screen.getByText("Apply"));
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it("clears the selected dates when the Clear button is clicked", () => {
+    const { container } = render(
+      <DateRangePicker
+        predefinedRanges={predefinedRanges}
+        onChange={onChange}
+      />
+    );
+
+    const inputEle = container.getElementsByTagName("input")[0];
+    fireEvent.click(inputEle);
+
+    const dateDivEle = container.getElementsByClassName("calendar-day")[25];
+    fireEvent.click(dateDivEle);
+    fireEvent.click(dateDivEle);
+    fireEvent.click(screen.getByText("Clear"));
+
+    const inputElem = container.getElementsByTagName("input")[0];
+    expect(inputElem.value).toBe("");
+  });
+
+  it("should not render the predefined ranges when predefinedRanges are not passed as prop", () => {
+    const { container } = render(<DateRangePicker onChange={onChange} />);
+
+    const inputEle = container.getElementsByTagName("input")[0];
+    fireEvent.click(inputEle);
+
+    const dateDivEle = container.getElementsByClassName("preDefined-range")[0];
+    expect(dateDivEle.childNodes.length).toBe(0);
   });
 });

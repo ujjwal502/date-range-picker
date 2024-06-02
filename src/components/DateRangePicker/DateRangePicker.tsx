@@ -1,31 +1,39 @@
-import React, { useCallback, useEffect, useReducer, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import Calendar from "../Calendar/Calendar";
 import CustomRanges from "../CustomRanges/CustomRanges";
 import { isWeekend } from "../Calendar/calendar.utils";
 import {
   CalendarContainer,
-  CalendarFooterButtonWrapper,
   DateRangePickerWrapper,
   InputField,
   InputIcon,
   InputWrapper,
-  ModalContent,
-  ModalOverlay,
   VerticalDivider,
 } from "./DateRangePicker.styles";
 import { DateRangePickerProps } from "./DateRangePicker.types";
 import {
   dateRangePickerReducer,
   formatDate,
+  generatePredefinedRanges,
   initialState,
 } from "./DateRangePicker.utils";
+import Modal, { ButtonConfig } from "../shared/Modal/Modal";
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
   predefinedRanges = [],
   onChange,
 }) => {
   const [state, dispatch] = useReducer(dateRangePickerReducer, initialState);
+  const [isDateRangeSelected, setIsDateRangeSelected] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const formattedRanges = generatePredefinedRanges(predefinedRanges);
 
   useEffect(() => {
     updateSelectedRange();
@@ -75,6 +83,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (isWeekend(date)) {
       return;
     }
+
     updateSelectedDates(date);
   };
 
@@ -96,8 +105,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         type: "SET_SELECTED_RANGE",
         payload: `${startDateString} ~ ${endDateString}`,
       });
+      setIsDateRangeSelected(true);
     } else {
       dispatch({ type: "SET_SELECTED_RANGE", payload: "" });
+      setIsDateRangeSelected(false);
     }
   };
 
@@ -172,18 +183,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     return weekendDates;
   };
 
-  const buttonConfig = [
+  const buttonConfig: ButtonConfig[] = [
     {
       className: "button-apply",
       handler: handleApplyClick,
       text: "Apply",
       id: 1,
+      disabled: !isDateRangeSelected,
     },
     {
       className: "button-clear",
       handler: handleClearClick,
       text: "Clear",
       id: 2,
+      disabled: false,
     },
   ];
 
@@ -199,53 +212,42 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         />
         <InputIcon>📅</InputIcon>
       </InputWrapper>
-      {state.isOpen && (
-        <ModalOverlay data-testid="calendar-modal">
-          <ModalContent ref={modalRef}>
-            <div onClick={closeModal} className="modal-close">
-              ❌
-            </div>
-            <CalendarContainer>
-              <Calendar
-                displayMonth={state.startMonth}
-                displayYear={state.startYear}
-                endDate={state.endDate!}
-                handleDateClick={handleDateClick}
-                handleMonthChange={handleStartMonthChange}
-                startDate={state.startDate!}
-                isWeekend={isWeekend}
-                handleYearChange={handleStartYearChange}
-              />
-              <VerticalDivider />
-              <Calendar
-                displayMonth={state.endMonth}
-                displayYear={state.endYear}
-                endDate={state.endDate!}
-                handleDateClick={handleDateClick}
-                handleMonthChange={handleEndMonthChange}
-                startDate={state.startDate!}
-                isWeekend={isWeekend}
-                handleYearChange={handleEndYearChange}
-              />
-            </CalendarContainer>
-            <CustomRanges
-              handlePredefinedRangeClick={handlePredefinedRangeClick}
-              predefinedRanges={predefinedRanges}
-            />
-            <CalendarFooterButtonWrapper>
-              {buttonConfig.map((config) => (
-                <button
-                  key={config.id}
-                  className={config.className}
-                  onClick={config.handler}
-                >
-                  {config.text}
-                </button>
-              ))}
-            </CalendarFooterButtonWrapper>
-          </ModalContent>
-        </ModalOverlay>
-      )}
+
+      <Modal
+        isOpen={state.isOpen}
+        onClose={closeModal}
+        footerButtons={buttonConfig}
+        modalRef={modalRef}
+      >
+        <CalendarContainer>
+          <Calendar
+            displayMonth={state.startMonth}
+            displayYear={state.startYear}
+            endDate={state.endDate!}
+            handleDateClick={handleDateClick}
+            handleMonthChange={handleStartMonthChange}
+            startDate={state.startDate!}
+            isWeekend={isWeekend}
+            handleYearChange={handleStartYearChange}
+          />
+          <VerticalDivider />
+
+          <Calendar
+            displayMonth={state.endMonth}
+            displayYear={state.endYear}
+            endDate={state.endDate!}
+            handleDateClick={handleDateClick}
+            handleMonthChange={handleEndMonthChange}
+            startDate={state.startDate!}
+            isWeekend={isWeekend}
+            handleYearChange={handleEndYearChange}
+          />
+        </CalendarContainer>
+        <CustomRanges
+          handlePredefinedRangeClick={handlePredefinedRangeClick}
+          predefinedRanges={formattedRanges}
+        />
+      </Modal>
     </DateRangePickerWrapper>
   );
 };
